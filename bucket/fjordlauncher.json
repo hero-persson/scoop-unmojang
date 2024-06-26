@@ -1,7 +1,7 @@
 {
     "version": "8.4",
     "description": "Prism Launcher fork with support for alternative auth servers",
-    "homepage": "https://github.com/unmojang/FjordLauncher/",
+    "homepage": "https://github.com/hero-persson/FjordLauncherUnlocked/",
     "license": "GPL-3.0-only",
     "notes": [
         "To add Fjord Launcher file association options for .ZIPs and .MRPACKS, run this: \"$dir\\install-associations.reg\"",
@@ -11,8 +11,8 @@
     ],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/unmojang/FjordLauncher/releases/download/8.4/FjordLauncher-Windows-MSVC-Portable-8.4.zip",
-            "hash": "6c7d3bf0059e991d3e7660d64af399781e0d1a111da13988a2178bd6546613e9"
+            "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/8.4/FjordLauncher-Windows-MSVC-Portable-8.4.zip",
+            "hash": "2073a22bf3bbd1eab03b891bc94493a180cccf48a030af14c6b3173e55398cb5"
         }
     },
     "suggest": {
@@ -74,12 +74,12 @@
         "fjordlauncher.cfg"
     ],
     "checkver": {
-        "github": "https://github.com/unmojang/FjordLauncher"
+        "github": "https://github.com/hero-persson/FjordLauncherUnlocked"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/unmojang/FjordLauncher/releases/download/$version/FjordLauncher-Windows-MSVC-Portable-$version.zip"
+                "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/$version/FjordLauncher-Windows-MSVC-Portable-$version.zip"
             }
         }
     }
