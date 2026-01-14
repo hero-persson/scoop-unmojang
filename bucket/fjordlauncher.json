@@ -1,22 +1,27 @@
 {
-    "version": "9.4.0",
+    "version": "10.0.2.0",
     "description": "Prism Launcher fork with support for alternative auth servers",
     "homepage": "https://github.com/hero-persson/FjordLauncherUnlocked",
     "license": "GPL-3.0-only",
     "notes": [
-        "To add Fjord Launcher file association options for .ZIPs and .MRPACKS, run this: \"$dir\\install-associations.reg\"",
+        "To add Fjord Launcher file association options for .ZIPs and .MRPACKS, run this:",
+        "reg import \"$dir\\install-associations.reg\"",
         "",
         "This package is now using the portable version of Fjord Launcher, and data should have been migrated automatically.",
         "If you are using a global install on a system with more than one user, you will need to copy a user's data from %appdata% to the new Scoop FjordLauncher persist directory"
     ],
-    "architecture": {
-        "64bit": {
-            "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/9.4.0/FjordLauncher-Windows-MSVC-Portable-9.4.0.zip",
-            "hash": "0406a437d69af8e7c810100f8c49b3413d576e60091d76d54ef088463505bc38"
-        }
-    },
     "suggest": {
         "Microsoft Visual C++ Redistributables": "extras/vcredist2022"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/10.0.2.0/FjordLauncher-Windows-MSVC-Portable-10.0.2.0.zip",
+            "hash": "0713fa0b20b5c778fc87a8c679d99ad4b51ea894c1d2834875320c32b767c80a"
+        },
+        "arm64": {
+            "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/10.0.2.0/FjordLauncher-Windows-MSVC-arm64-Portable-10.0.2.0.zip",
+            "hash": "04aec82f4f3f72b22f27e67108e80bc4f0afe1c5dc9d13fd638790191dde29a7"
+        }
     },
     "pre_install": [
         "$migration = $true",
@@ -31,16 +36,19 @@
         "} elseif (!($migration)) {",
         "    Write-Warning \"A global Scoop installation was detected with multiple user accounts. Please see the notes at the end of the install process.\"",
         "}",
-        "",
-        "'accounts.json', 'metacache', 'fjordlauncher.cfg' | ForEach-Object {",
-        "    if (!(Test-Path -Path $persist_dir\\$_)) {",
-        "        New-Item -Type File $persist_dir/$_ | Out-Null",
-        "    }",
-        "    New-Item -Type SymbolicLink -Value $persist_dir/$_ -Path $dir/$_ | Out-Null",
+        "# Hardlinks cannot work properly here, as this app would create a new file instead of writing directly.",
+        "# Please keep the file list the same in both pre_install and pre_uninstall scripts.",
+        "$contents = @{",
+        "    'metacache' = '{}'",
         "}",
-        "if (!(Get-Content $persist_dir/metacache)) {",
-        "    Add-Content $persist_dir/metacache '{}'",
-        "}"
+        "'accounts.json', 'metacache', 'fjordlauncher.cfg' | ForEach-Object {",
+        "    if (Test-Path \"$persist_dir\\$_\") {",
+        "        Copy-Item \"$persist_dir\\$_\" \"$dir\\$_\" -Force",
+        "    } else {",
+        "        Set-Content -Path \"$dir\\$_\" -Value $contents[$_]",
+        "    }",
+        "}",
+        "Remove-Item -Path \"$dir\\fjordlauncher_updater.exe\" -Force -ErrorAction Ignore"
     ],
     "post_install": [
         "'install-associations', 'uninstall-associations' | ForEach-Object {",
@@ -66,12 +74,24 @@
         "icons",
         "iconthemes",
         "instances",
+        "java",
         "libraries",
         "logs",
         "meta",
         "mods",
+        "skins",
         "themes",
         "translations"
+    ],
+    "pre_uninstall": [
+        "# Hardlinks cannot work properly here, as this app would create a new file instead of writing directly.",
+        "# Please keep the file list the same in both pre_install and pre_uninstall scripts.",
+        "'accounts.json', 'metacache', 'fjordlauncher.cfg' | ForEach-Object {",
+        "    if (Test-Path -Path \"$dir\\$_\") {",
+        "        Copy-Item -Path \"$dir\\$_\" -Destination \"$persist_dir\\$_\" -Force",
+        "    }",
+        "}",
+        "if ($cmd -eq 'uninstall') { reg import \"$dir\\uninstall-associations.reg\" }"
     ],
     "checkver": {
         "github": "https://github.com/hero-persson/FjordLauncherUnlocked"
@@ -80,6 +100,9 @@
         "architecture": {
             "64bit": {
                 "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/$version/FjordLauncher-Windows-MSVC-Portable-$version.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/hero-persson/FjordLauncherUnlocked/releases/download/$version/FjordLauncher-Windows-MSVC-arm64-Portable-$version.zip"
             }
         }
     }
